@@ -1,3 +1,3 @@
 package com.example.photogallery
 
-data class Image(val path: String, val name: String)
+data class Image(val name: String, val resId: Int)

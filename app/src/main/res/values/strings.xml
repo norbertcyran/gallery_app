@@ -2,4 +2,5 @@
     <string name="app_name">Photo Gallery</string>
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send</string>
+    <string name="image_content_description">Gallery image</string>
 </resources>
