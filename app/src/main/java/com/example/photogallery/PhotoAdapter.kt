@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
 class PhotoAdapter(
     private val photos: ArrayList<Image>,
@@ -16,7 +17,7 @@ class PhotoAdapter(
     inner class ViewHolder(imageView: View) : RecyclerView.ViewHolder(imageView) {
         private val imageView: ImageView = itemView.findViewById(R.id.galleryImage)
         fun bind(image: Image) {
-            imageView.setImageResource(image.resId)
+            Glide.with(context).load(image.uri).into(imageView)
 
             imageView.setOnClickListener {
                 clickListener(it, adapterPosition)

@@ -4,8 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
-import kotlinx.android.synthetic.main.item_image_fullscreen.view.*
+import com.bumptech.glide.Glide
 
 class PhotoFullscreenPagerAdapter(private val images: ArrayList<Image>) : PagerAdapter() {
     private lateinit var context: Context
@@ -26,7 +27,7 @@ class PhotoFullscreenPagerAdapter(private val images: ArrayList<Image>) : PagerA
 
         val image = images[position]
 
-        view.fullscreenImage.setImageResource(image.resId)
+        Glide.with(context).load(image.uri).into(view as ImageView)
         container.addView(view)
 
         return view

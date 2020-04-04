@@ -11,7 +11,8 @@ class PhotoFullscreenActivity : AppCompatActivity() {
         setContentView(R.layout.activity_photo_fullscreen)
 
         val position = intent.extras!!.get(IMAGE_POSITION)
-        val adapter = PhotoFullscreenPagerAdapter(PHOTOS)
+        val photos: ArrayList<Image> = intent.extras!!.getParcelableArrayList(IMAGES_PARCEL)!!
+        val adapter = PhotoFullscreenPagerAdapter(photos)
 
         findViewById<ViewPager>(R.id.viewPager).apply {
             setAdapter(adapter)

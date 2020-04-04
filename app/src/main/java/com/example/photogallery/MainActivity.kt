@@ -1,34 +1,44 @@
 package com.example.photogallery
 
+import android.app.Activity
+import android.content.ContentUris
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.Manifest
+import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 const val GRID_COLUMNS = 3
 
-val PHOTOS: ArrayList<Image> = ArrayList<Image>().apply {
-    add(Image("photo 1", R.drawable.images))
-    add(Image("photo 2", R.drawable.images2))
-    add(Image("photo 3", R.drawable.images3))
-    add(Image("photo 4", R.drawable.pronation_feet_runner_shoes))
-    add(Image("photo 5", R.drawable.running))
-    add(Image("photo 6", R.drawable.run_marathon_backward_crop))
-    add(Image("photo 7", R.drawable.index))
-    add(Image("photo 8", R.drawable.index2))
-}
-
+const val IMAGES_PARCEL = "com.example.photogallery.IMAGE_PARCEL"
 const val IMAGE_POSITION = "com.example.photogallery.IMAGE_POSITION"
+const val READ_STORAGE_CODE = 99
 
 class MainActivity : AppCompatActivity() {
+    lateinit var photos: ArrayList<Image>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        if (!hasPermissions()) {
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                READ_STORAGE_CODE
+            )
+        }
+        else {
+            photos = loadImages(this)
+        }
+        println(photos)
         val viewManager = GridLayoutManager(this, GRID_COLUMNS)
-        val adapter = PhotoAdapter(PHOTOS) { _, pos ->
+        val adapter = PhotoAdapter(photos) { _, pos ->
             maximizePhoto(pos)
         }
         findViewById<RecyclerView>(R.id.photosGrid).apply {
@@ -39,8 +49,62 @@ class MainActivity : AppCompatActivity() {
 
     private fun maximizePhoto(position: Int) {
         val intent = Intent(this, PhotoFullscreenActivity::class.java).apply {
+            putParcelableArrayListExtra(IMAGES_PARCEL, photos)
             putExtra(IMAGE_POSITION, position)
         }
         startActivity(intent)
     }
+
+    private fun hasPermissions(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            READ_STORAGE_CODE -> {
+                if (
+                    grantResults.isNotEmpty()
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                )
+                    photos = loadImages(this)
+                else
+                    Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT)
+                        .show()
+            }
+            else -> {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
+        }
+    }
+}
+
+fun loadImages(activity: Activity): ArrayList<Image> {
+    val imagesList = ArrayList<Image>()
+
+    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    val projection = arrayOf(
+        MediaStore.Images.ImageColumns._ID,
+        MediaStore.Images.ImageColumns.DATE_ADDED
+    )
+    val sortOrder = "${MediaStore.Images.ImageColumns.DATE_ADDED} ASC"
+
+    activity.contentResolver.query(uri, projection, null, null, sortOrder)
+        ?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID)
+
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val contentUri =  Uri.withAppendedPath(uri, id.toString())
+                imagesList.add(Image(contentUri))
+            }
+        }
+    println(imagesList)
+    return imagesList
 }
