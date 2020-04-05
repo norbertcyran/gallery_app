@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                 READ_STORAGE_CODE
             )
+            photos = ArrayList()
         } else {
             photos = loadImages(this)
         }
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                     grantResults.isNotEmpty() &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED
                 )
-                    photos = loadImages(this)
+                    reload()
                 else
                     Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT)
                         .show()
@@ -79,6 +80,13 @@ class MainActivity : AppCompatActivity() {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             }
         }
+    }
+
+    fun reload() {
+        finish()
+        overridePendingTransition(0, 0)
+        startActivity(intent)
+        overridePendingTransition(0, 0)
     }
 }
 
