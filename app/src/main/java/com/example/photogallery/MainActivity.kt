@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
         else {
             photos = loadImages(this)
         }
-        println(photos)
         val viewManager = GridLayoutManager(this, GRID_COLUMNS)
         val adapter = PhotoAdapter(photos) { _, pos ->
             maximizePhoto(pos)
@@ -105,6 +104,5 @@ fun loadImages(activity: Activity): ArrayList<Image> {
                 imagesList.add(Image(contentUri))
             }
         }
-    println(imagesList)
     return imagesList
 }
