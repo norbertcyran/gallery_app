@@ -1,10 +1,9 @@
 package com.example.photogallery
 
+import android.Manifest
 import android.app.Activity
-import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.Manifest
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -32,8 +31,7 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                 READ_STORAGE_CODE
             )
-        }
-        else {
+        } else {
             photos = loadImages(this)
         }
         val viewManager = GridLayoutManager(this, GRID_COLUMNS)
@@ -69,8 +67,8 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             READ_STORAGE_CODE -> {
                 if (
-                    grantResults.isNotEmpty()
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    grantResults.isNotEmpty() &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED
                 )
                     photos = loadImages(this)
                 else
@@ -100,7 +98,7 @@ fun loadImages(activity: Activity): ArrayList<Image> {
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
-                val contentUri =  Uri.withAppendedPath(uri, id.toString())
+                val contentUri = Uri.withAppendedPath(uri, id.toString())
                 imagesList.add(Image(contentUri))
             }
         }

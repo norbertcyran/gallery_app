@@ -24,5 +24,4 @@ data class Image(val uri: Uri) : Parcelable {
             return arrayOfNulls(size)
         }
     }
-
 }
